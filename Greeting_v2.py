@@ -1,0 +1,187 @@
+# -*- coding: utf-8 -*-
+import picamera
+import picamera.array
+import cv2 as cv
+
+from datetime import datetime
+import time
+import random
+import subprocess
+
+import jtalk
+
+morning = 'おはようございまーすっ'
+evening = 'おつかれさまですーーぅ'
+mng_lst = ['ういーす',
+           'おーす',
+           'ぐっもーにん',
+           'おはよございます',
+           'おいーす',
+           'おはようぐると',
+           'ざいまーす',
+           'もーにん',
+           'おはよお',
+           'ざーす']
+evg_lst = ['おつかれさまんさ',
+           'おっつー',
+           'おつかれー',
+           'おいっす',
+           'おつかれーらいす',
+           'お',
+           'おつかれいしゅう',
+           'おつかれえ',
+           'いーす',
+           'ちーす']
+mono_lst = ['んーーーー',
+           'ひいーー',
+           'ふーーー',
+           'ふっ',
+           'ふっふっ',
+           'しぇーー',
+           'しゅっ',
+           'しょっ',
+           'じゃっ',
+           'しゃーーー',
+           'おらおらおらおらおらー',
+           'ばるばるばるばるばるー',
+           'ばおーー',
+           'きゅー',
+           'むーーーー',
+           'おおおおおおおお',
+           'むむむ',
+           'うむ',
+           'うわーー',
+           'にーーーん',
+           'はふ',
+           'はひ',
+           'むーーーーん',
+           'ひでぶっ',
+           'あべしっ',
+           'ぐぬぬ',
+           'ひょっ',
+           'ぐわーーーー',
+           'ぐおーーーー',
+           'おうふ',
+           'すううううーー',
+           'ぶううううーー',
+           'ぶーーーーーん',
+           'ごごごごごご',
+           'ずこっ',
+           'ずっきゅうううん',
+           'どっきゅうううん',
+           'ぎゃーん',
+           'がーーーん',
+           'ざわ　ざわ　ざわ',
+           'びくっ',
+           'ぎくっ',
+           'あたたたたたたた',
+           'ほおあ',
+           'ぎゅー']
+t_st = 0
+
+img = cv.imread('受付_Moment.jpg')
+img_resize = cv.resize(img, (640, 365))
+cv.imshow("reception", img_resize)
+cv.moveWindow("reception", -35, -3) 
+
+jtalk.jtalk('挨拶システム 起動しまーーーすっ')
+d = datetime.now()
+nxt_h = d.hour
+nxt_m = random.randint(0, 59)
+
+'''
+for i in mono_lst:
+    print(i)
+    jtalk.jtalk(i)
+    time.sleep(1)
+for i in mng_lst:
+    print(i)
+    jtalk.jtalk(i)
+    time.sleep(1)
+for i in evg_lst:
+    print(i)
+    jtalk.jtalk(i)
+    time.sleep(1)
+'''
+# カメラ初期化
+with picamera.PiCamera() as camera:
+    # カメラの画像をリアルタイムで取得するための処理
+    with picamera.array.PiRGBArray(camera) as stream:
+        # 解像度の設定
+        camera.resolution = (512, 384)
+        # 顔検出のための学習元データを読み込む
+        face_cascade = cv.CascadeClassifier('haarcascades/haarcascade_frontalface_default.xml')
+        # 目検出のための学習元データを読み込む
+        eye_cascade = cv.CascadeClassifier('haarcascades/haarcascade_eye.xml')
+
+        while True:
+            # カメラから映像を取得する（OpenCVへ渡すために、各ピクセルの色の並びをBGRの順番にする）
+            camera.capture(stream, 'bgr', use_video_port=True)
+            # 顔検出の処理効率化のために、写真の情報量を落とす（モノクロにする）
+            grayimg = cv.cvtColor(stream.array, cv.COLOR_BGR2GRAY)
+
+            # 顔検出を行う
+            facerect = face_cascade.detectMultiScale(grayimg, scaleFactor=1.2, minNeighbors=2, minSize=(100, 100))
+            # 目検出を行う
+            eyerect = eye_cascade.detectMultiScale(grayimg)
+            
+            # 顔が検出された場合
+            if len(facerect) > 0:
+                # 検出した場所すべてに赤色で枠を描画する
+                for rect in facerect:
+                    cv.rectangle(stream.array, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 0, 255), thickness=3)
+
+            # 目を検出した場合
+            if len(eyerect) > 0:
+                # 検出した場所すべてに緑色で枠を描画する
+                for rect in eyerect:
+                    cv.rectangle(stream.array, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 255, 0), thickness=3)
+
+            # 結果の画像を表示する
+#            cv.imshow('camera', stream.array)
+
+            # 顔か目を検出したら挨拶
+            if len(facerect) > 0 or len(eyerect) > 1:
+                if (time.time() - t_st) > 5:
+                    #前回から5秒以上経過していたら挨拶
+                    cmd = "omxplayer 受付.mp4"
+                    proc = subprocess.Popen(cmd,shell=True,stdin=subprocess.PIPE)
+                    d = datetime.now()
+                    rnd = random.randint(0, 40)
+                    print(rnd)
+                    if (d.hour > 5) and (d.hour < 12):
+                        if rnd > (len(mng_lst) - 1):
+                            jtalk.jtalk(morning)
+                        else:
+                            jtalk.jtalk(mng_lst[rnd])
+                    else:
+                        if rnd > (len(evg_lst) - 1):
+                            jtalk.jtalk(evening)
+                        else:
+                            jtalk.jtalk(evg_lst[rnd])
+
+                    proc.kill()
+                    t_st = time.time()
+
+            # 現在時刻読み込み
+            d = datetime.now()
+            if d.hour == nxt_h and d.minute == nxt_m:
+                cmd = "omxplayer 受付.mp4"
+                proc = subprocess.Popen(cmd,shell=True,stdin=subprocess.PIPE)
+                jtalk.jtalk(mono_lst[random.randint(0, len(mono_lst) - 1)])
+                proc.kill()
+
+                nxt_h = d.hour + 1
+                nxt_m = random.randint(0, 59)
+                print(nxt_h, nxt_m)
+
+            # カメラから読み込んだ映像を破棄する
+            stream.seek(0)
+            stream.truncate()
+            
+            # 何かキーが押されたかどうかを検出する（検出のため、1ミリ秒待つ）
+            if cv.waitKey(1) > 0:
+                break
+
+        # 表示したウィンドウを閉じる
+        cv.destroyAllWindows()
