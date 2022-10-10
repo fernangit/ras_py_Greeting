@@ -176,6 +176,8 @@ with picamera.PiCamera() as camera:
 
                     proc.kill()
                     t_st = time.time()
+                    # 初期位置がずれていたときの補正
+                    cv.moveWindow("M's Aisatsu Unit", -35, -3) 
 
             # 現在時刻読み込み
             d = datetime.now()
