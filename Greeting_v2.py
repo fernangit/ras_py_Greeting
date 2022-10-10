@@ -33,6 +33,20 @@ evg_lst = ['おつかれさまんさ',
            'いーす',
            'ちーす']
 mono_lst = ['んーーーー',
+           'おれのなをいってみろ',
+           'なっ何をするだー',
+           '認めたくないものだな',
+           'バスケがしたいです',
+           'やれやれだぜ',
+           'きんきんにひえてやがる',
+           'てめえらの血はなにいろだーっ',
+           'ズビズバー',
+           '人間がゴミのようだ',
+           'ぬんっ',
+           'うりりりりりりぃぃ',
+           'めめたぁ',
+           'せいっ',
+           'ぱぱうぱうぱう',
            'ひいーー',
            'ふーーー',
            'ふっ',
@@ -71,7 +85,7 @@ mono_lst = ['んーーーー',
            'どっきゅうううん',
            'ぎゃーん',
            'がーーーん',
-           'ざわ　ざわ　ざわ',
+           'ざわ ざわ ざわ',
            'びくっ',
            'ぎくっ',
            'あたたたたたたた',
@@ -81,8 +95,8 @@ t_st = 0
 
 img = cv.imread('受付_Moment.jpg')
 img_resize = cv.resize(img, (640, 365))
-cv.imshow("reception", img_resize)
-cv.moveWindow("reception", -35, -3) 
+cv.imshow("M's Aisatsu Unit", img_resize)
+cv.moveWindow("M's Aisatsu Unit", -35, -3) 
 
 jtalk.jtalk('挨拶システム 起動しまーーーすっ')
 d = datetime.now()
@@ -93,7 +107,7 @@ nxt_m = random.randint(0, 59)
 for i in mono_lst:
     print(i)
     jtalk.jtalk(i)
-    time.sleep(1)
+    time.sleep(3)
 for i in mng_lst:
     print(i)
     jtalk.jtalk(i)
