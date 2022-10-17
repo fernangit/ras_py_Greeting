@@ -108,12 +108,12 @@ mono_lst = ['んーーーー',
            'ぎゅー']
 t_st = 0
 
-img = cv.imread('受付_Moment.jpg')
-img_resize = cv.resize(img, (640, 365))
-cv.imshow("M's Aisatsu Unit", img_resize)
-cv.moveWindow("M's Aisatsu Unit", -35, -3) 
+img = cv.imread('受付_Idle.jpg')
+cv.namedWindow('M's Aisatsu Unit', cv.WINDOW_NORMAL)
+cv.setWindowProperty('M's Aisatsu Unit', cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
+cv.imshow('M's Aisatsu Unit', img)
 
-jtalk.jtalk('えむず　あいさつユニット しどうっ')
+jtalk.jtalk('えむず　あいさつユニット　しどうっ')
 d = datetime.now()
 nxt_h = d.hour
 nxt_m = random.randint(0, 59)
@@ -132,6 +132,7 @@ for i in evg_lst:
     jtalk.jtalk(i)
     time.sleep(1)
 '''
+
 # カメラ初期化
 with picamera.PiCamera() as camera:
     # カメラの画像をリアルタイムで取得するための処理
@@ -199,20 +200,21 @@ with picamera.PiCamera() as camera:
 #                for rect in lowerbodyrect:
 #                    cv.rectangle(stream.array, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (255, 0, 0), thickness=3)
 
-            # 結果の画像を表示する
-#            cv.imshow('camera', stream.array)
+#            # 結果の画像を表示する
+            cv.imshow('camera', stream.array)
             img_resize = cv.resize(stream.array, (100, 100))
             cv.imshow("camera", img_resize)
             cv.moveWindow("camera", 0, 300) 
-#
+
 #            # 顔か目を検出したら挨拶
 #            if len(facerect) > 0 or len(eyerect) > 1:
-            # 体を検出したら挨拶
+#            # 体を検出したら挨拶
 #            if len(bodyrect) > 0 or len(upperbodyrect) > 0 or len(lowerbodyrect) > 0:
 #            if len(bodyrect) > 0 or len(upperbodyrect) > 0:
+            # 体か目を検出したら挨拶
             if len(eyerect) > 1 or len(upperbodyrect) > 0:
+                #前回から5秒以上経過していたら挨拶
                 if (time.time() - t_st) > 5:
-                    #前回から5秒以上経過していたら挨拶
                     cmd = "omxplayer 受付.mp4"
                     proc = subprocess.Popen(cmd,shell=True,stdin=subprocess.PIPE)
                     d = datetime.now()

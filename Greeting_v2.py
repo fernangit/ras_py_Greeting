@@ -125,7 +125,7 @@ cmd = "exec omxplayer --loop アイドル.mp4"
 idleProc = subprocess.Popen(cmd,shell=True,stdin=subprocess.PIPE)
 time.sleep(3)
 
-jtalk.jtalk('えむず　あいさつユニット しどうっ')
+jtalk.jtalk('えむず　あいさつユニット　しどうっ')
 d = datetime.now()
 nxt_h = d.hour
 nxt_m = random.randint(0, 59)
@@ -182,6 +182,7 @@ with picamera.PiCamera() as camera:
 #            # 下半身検出を行う
 #            lowerbodyrect = lowerbody_cascade.detectMultiScale(grayimg, scaleFactor=1.1, minNeighbors=3, minSize=(40,40))
 
+'''
 #            # 顔が検出された場合
 #            if len(facerect) > 0:
 #                # 検出した場所すべてに赤色で枠を描画する
@@ -217,15 +218,18 @@ with picamera.PiCamera() as camera:
             img_resize = cv.resize(stream.array, (100, 100))
             cv.imshow("camera", img_resize)
             cv.moveWindow("camera", 0, 300) 
+'''
+
 #
 #            # 顔か目を検出したら挨拶
 #            if len(facerect) > 0 or len(eyerect) > 1:
-            # 体を検出したら挨拶
+#            # 体を検出したら挨拶
 #            if len(bodyrect) > 0 or len(upperbodyrect) > 0 or len(lowerbodyrect) > 0:
 #            if len(bodyrect) > 0 or len(upperbodyrect) > 0:
+            # 体か目を検出したら挨拶
             if len(eyerect) > 1 or len(upperbodyrect) > 0:
+                #前回から5秒以上経過していたら挨拶
                 if (time.time() - t_st) > 5:
-                    #前回から5秒以上経過していたら挨拶
                     #アイドル動画停止
                     try:
                         idleProc.stdin.write("p")
@@ -247,7 +251,6 @@ with picamera.PiCamera() as camera:
                             jtalk.jtalk(evening)
                         else:
                             jtalk.jtalk(evg_lst[rnd])
-
                     time.sleep(3)
                     #挨拶動画停止
                     try:
