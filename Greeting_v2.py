@@ -112,9 +112,12 @@ t_st = 0
 
 '''
 img = cv.imread('受付_Moment.jpg')
-img_resize = cv.resize(img, (640, 365))
-cv.imshow("M's Aisatsu Unit", img_resize)
-cv.moveWindow("M's Aisatsu Unit", -35, -3) 
+#img_resize = cv.resize(img, (640, 365))
+#cv.imshow("M's Aisatsu Unit", img_resize)
+#cv.moveWindow("M's Aisatsu Unit", -35, -3) 
+cv.namedWindow('M's Aisatsu Unit', cv.WINDOW_NORMAL)
+cv.setWindowProperty('M's Aisatsu Unit', cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
+cv.imshow('M's Aisatsu Unit', img)
 '''
 
 #アイドル動画をループ再生
