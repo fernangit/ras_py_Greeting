@@ -106,8 +106,10 @@ mono_lst = ['んーーーー',
            'ぎくっ',
            'あたたたたたたた',
            'ほおあ',
+           'くそがっ',
            'ぎゅー']
 t_st = 0
+
 '''
 img = cv.imread('受付_Moment.jpg')
 img_resize = cv.resize(img, (640, 365))
@@ -118,6 +120,7 @@ cv.moveWindow("M's Aisatsu Unit", -35, -3)
 #アイドル動画をループ再生
 cmd = "exec omxplayer --loop アイドル.mp4"
 idleProc = subprocess.Popen(cmd,shell=True,stdin=subprocess.PIPE)
+time.sleep(3)
 
 jtalk.jtalk('えむず　あいさつユニット しどうっ')
 d = datetime.now()
@@ -138,6 +141,7 @@ for i in evg_lst:
     jtalk.jtalk(i)
     time.sleep(1)
 '''
+
 # カメラ初期化
 with picamera.PiCamera() as camera:
     # カメラの画像をリアルタイムで取得するための処理
@@ -219,11 +223,12 @@ with picamera.PiCamera() as camera:
             if len(eyerect) > 1 or len(upperbodyrect) > 0:
                 if (time.time() - t_st) > 5:
                     #前回から5秒以上経過していたら挨拶
+                    #アイドル動画停止
                     try:
-                        idleProc.stdin.write("q")
+                        idleProc.stdin.write("p")
                     except IOError as e:
                         print("Handle error")
-
+                    #挨拶動画再生
                     cmd = "exec omxplayer 受付.mp4"
                     proc = subprocess.Popen(cmd,shell=True,stdin=subprocess.PIPE)
                     d = datetime.now()
@@ -240,16 +245,17 @@ with picamera.PiCamera() as camera:
                         else:
                             jtalk.jtalk(evg_lst[rnd])
 
-#                    proc.kill()
                     time.sleep(3)
+                    #挨拶動画停止
                     try:
                         proc.stdin.write("q")
                     except IOError as e:
                         print("Handle error")
-
-                    #アイドル動画をループ再生
-                    cmd = "exec omxplayer --loop アイドル.mp4"
-                    idleProc = subprocess.Popen(cmd,shell=True,stdin=subprocess.PIPE)
+                    #アイドル動画再起動
+                    try:
+                        idleProc.stdin.write("p")
+                    except IOError as e:
+                        print("Handle error")
 
                     t_st = time.time()
 #                    # 初期位置がずれていたときの補正
@@ -258,22 +264,26 @@ with picamera.PiCamera() as camera:
             # 現在時刻読み込み
             d = datetime.now()
             if d.hour == nxt_h and d.minute == nxt_m:
+                #アイドル動画停止
                 try:
-                    idleProc.stdin.write("q")
+                    idleProc.stdin.write("p")
                 except IOError as e:
                     print("Handle error")
+                #挨拶動画再生
                 cmd = "omxplayer 受付.mp4"
                 proc = subprocess.Popen(cmd,shell=True,stdin=subprocess.PIPE)
                 jtalk.jtalk(mono_lst[random.randint(0, len(mono_lst) - 1)])
-#                proc.kill()
                 time.sleep(3)
+                #挨拶動画停止
                 try:
                     proc.stdin.write("q")
                 except IOError as e:
                     print("Handle error")
-                #アイドル動画をループ再生
-                cmd = "exec omxplayer --loop アイドル.mp4"
-                idleProc = subprocess.Popen(cmd,shell=True,stdin=subprocess.PIPE)
+                #アイドル動画再起動
+                try:
+                    idleProc.stdin.write("p")
+                except IOError as e:
+                    print("Handle error")
 
                 nxt_h = d.hour + 1
                 nxt_m = random.randint(0, 59)
