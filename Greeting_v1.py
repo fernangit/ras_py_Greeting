@@ -109,9 +109,12 @@ mono_lst = ['んーーーー',
 t_st = 0
 
 img = cv.imread('受付_Idle.jpg')
-cv.namedWindow('M's Aisatsu Unit', cv.WINDOW_NORMAL)
-cv.setWindowProperty('M's Aisatsu Unit', cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
-cv.imshow('M's Aisatsu Unit', img)
+#cv.namedWindow("M's Aisatsu Unit", cv.WINDOW_NORMAL)
+#cv.setWindowProperty("M's Aisatsu Unit", cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
+#cv.imshow("M's Aisatsu Unit", img)
+img_resize = cv.resize(img, (430,630))
+cv.imshow("M's Aisatsu Unit", img_resize)
+cv.moveWindow("M's Aisatsu Unit", -14, -25) 
 
 jtalk.jtalk('えむず　あいさつユニット　しどうっ')
 d = datetime.now()
@@ -234,7 +237,7 @@ with picamera.PiCamera() as camera:
                     proc.kill()
                     t_st = time.time()
                     # 初期位置がずれていたときの補正
-                    cv.moveWindow("M's Aisatsu Unit", -35, -3) 
+                    cv.moveWindow("M's Aisatsu Unit", -14, -25) 
 
             # 現在時刻読み込み
             d = datetime.now()

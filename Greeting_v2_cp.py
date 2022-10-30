@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os, sys, errno
-import signal
 import picamera
 import picamera.array
 import cv2 as cv
@@ -74,7 +73,6 @@ mono_lst = ['んーーーー',
            'じゃっ',
            'しゃーーー',
            'おらおらおらおらおらー',
-           'おうおうおうおうおうー',
            'ばるばるばるばるばるー',
            'ばおーー',
            'きゅー',
@@ -112,18 +110,18 @@ mono_lst = ['んーーーー',
            'ぎゅー']
 t_st = 0
 
-img = cv.imread('受付_Idle.jpg')
-#cv.namedWindow("M's Aisatsu Unit", cv.WINDOW_NORMAL)
+img = cv.imread('受付_Moment.jpg')
+#img_resize = cv.resize(img, (640, 365))
+#cv.imshow("M's Aisatsu Unit", img_resize)
+#cv.moveWindow("M's Aisatsu Unit", -35, -3) 
+cv.namedWindow("M's Aisatsu Unit", cv.WINDOW_NORMAL)
 #cv.setWindowProperty("M's Aisatsu Unit", cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
-#cv.imshow("M's Aisatsu Unit", img)
-img_resize = cv.resize(img, (430,630))
-cv.imshow("M's Aisatsu Unit", img_resize)
-cv.moveWindow("M's Aisatsu Unit", -10, -30) 
+cv.imshow("M's Aisatsu Unit", img)
 
 #アイドル動画をループ再生
-#cmd = "exec omxplayer --loop アイドル.mp4"
-#idleProc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
-#time.sleep(3)
+cmd = "exec omxplayer --loop アイドル.mp4"
+idleProc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+time.sleep(3)
 
 jtalk.jtalk('えむず　あいさつユニット　しどうっ')
 d = datetime.now()
@@ -174,31 +172,12 @@ with picamera.PiCamera() as camera:
             # 上半身検出を行う
             upperbodyrect = upperbody_cascade.detectMultiScale(grayimg, scaleFactor=1.1, minNeighbors=3, minSize=(40,40))
 
-            # 目を検出した場合
-            if len(eyerect) > 0:
-                # 検出した場所すべてに緑色で枠を描画する
-                for rect in eyerect:
-                    cv.rectangle(stream.array, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (0, 255, 0), thickness=3)
-
-            # 上半身を検出した場合
-            if len(upperbodyrect) > 0:
-                # 検出した場所すべてに緑色で枠を描画する
-                for rect in upperbodyrect:
-                    cv.rectangle(stream.array, tuple(rect[0:2]), tuple(rect[0:2]+rect[2:4]), (255, 0, 0), thickness=3)
-
-            # 結果の画像を表示する
-            cv.imshow('camera', stream.array)
-            img_resize = cv.resize(stream.array, (100, 100))
-            cv.imshow("camera", img_resize)
-            cv.moveWindow("camera", 0, 300) 
-
             # 体か目を検出したら挨拶
             if len(eyerect) > 1 or len(upperbodyrect) > 0:
-                print("eyrect=",len(eyerect),"upperbodyrect=",len(upperbodyrect))
                 #前回から5秒以上経過していたら挨拶
                 if (time.time() - t_st) > 5:
-#                    #アイドル動画停止
-#                    os.killpg(os.getpgid(idleProc.pid), signal.SIGTERM)
+                    #アイドル動画停止
+                    os.killpg(os.getpgid(idleProc.pid), signal.SIGTERM)
                     #挨拶動画再生
                     cmd = "exec omxplayer 受付.mp4"
                     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
@@ -218,21 +197,18 @@ with picamera.PiCamera() as camera:
                     time.sleep(3)
                     #挨拶動画停止
                     os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
-#                    #アイドル動画再起動
-#                    cmd = "exec omxplayer --loop アイドル.mp4"
-#                    idleProc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
-#                    time.sleep(3)
-
-                    # 初期位置がずれていたときの補正
-                    cv.moveWindow("M's Aisatsu Unit", -10, -30) 
+                    #アイドル動画再起動
+                    cmd = "exec omxplayer --loop アイドル.mp4"
+                    idleProc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+                    time.sleep(3)
 
                     t_st = time.time()
 
             # 現在時刻読み込み
             d = datetime.now()
             if d.hour == nxt_h and d.minute == nxt_m:
-#                #アイドル動画停止
-#                os.killpg(os.getpgid(idleProc.pid), signal.SIGTERM)
+                #アイドル動画停止
+                os.killpg(os.getpgid(idleProc.pid), signal.SIGTERM)
                 #挨拶動画再生
                 cmd = "omxplayer 受付.mp4"
                 proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
@@ -240,10 +216,10 @@ with picamera.PiCamera() as camera:
                 time.sleep(3)
                 #挨拶動画停止
                 os.killpg(os.getpgid(proc.pid), signal.SIGTERM)
-#                #アイドル動画再起動
-#                cmd = "exec omxplayer --loop アイドル.mp4"
-#                idleProc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
-#                time.sleep(3)
+                #アイドル動画再起動
+                cmd = "exec omxplayer --loop アイドル.mp4"
+                idleProc = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
+                time.sleep(3)
 
                 nxt_h = d.hour + 1
                 nxt_m = random.randint(0, 59)
